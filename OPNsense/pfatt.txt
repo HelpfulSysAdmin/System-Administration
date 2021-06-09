@@ -1,0 +1,47 @@
+Capture Interface config
+	Plug in ONT to the firewall
+		Note which interface went from down to up
+	Plug in ATT Router to the firewall
+		Note which interface went from down to up
+
+Download/Edit opnatt.sh
+	Download the file from GitHub
+		https://github.com/MonkWho/pfatt
+			/bin/
+	Set ONT_IF to the ONT interface from above
+	Set RG_IF to the router interface from above
+	Set RG_ETHER_ADDR to the router MAC address
+
+Move and rename opnatt.sh to the firewall
+	/usr/local/etc/rc.syshook.d/early/99-opnatt.sh
+	
+	Check permissions for "execute"
+		ls -lah /usr/local/etc/rc.syshook.d/early/
+		
+		If 'x' is missing, add execute permissions
+			chmod +x /usr/local/etc/rc.syshook.d/early/99-opnatt.sh
+
+Reboot OPNsense
+
+Assign WAN interface to new interface ngeth0
+	Assign via ssh/vga output
+
+Add MAC Address of ATT Router to the WAN interface
+	Interfaces -> [WAN] -> "MAC address"
+
+Configure IPv6
+	Interfaces -> [WAN]
+		Set "IPv6 Configuration Type" to "DHCPv6"
+		
+		"DHCPv6 client configuration"
+			Enable "Request only an IPv6 prefix"
+			Set "Prefix delegation size" to 60
+			Enable "Send IPv6 prefix hint
+	
+	Interfaces -> [LAN]
+		Set "IPv6 Configuration Type" to "Track Interface"
+		
+		"Track IPv6 Interface"
+			Set "IPv6 Interface" to "WAN"
+	
+	Reboot

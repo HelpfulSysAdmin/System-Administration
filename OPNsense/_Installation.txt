@@ -1,0 +1,48 @@
+Download the installer
+	https://opnsense.org/download/
+		Note the SHA256 checksum after selecting the type
+	https://docs.opnsense.org/manual/install.html#installation-media
+		Use this to help determine which one is best for your use case
+
+Verify the download
+	Windows
+		Open powershell
+		Run command
+			Get-FileHash <DownloadPath>\OPNsense-21.1-OpenSSL-vga-amd64.img.bz2 -Algorithm SHA256
+		
+		If file hash does not match the checksum from above, it is either corrupt or not valid
+			Redownload and verify again
+
+Unzip the download
+	A program such as 7-Zip will be able to unzip bz2
+	Right Click the file - 7-Zip - Extract to "OPNsense-21.1-OpenSSL-vga-amd64.img\"
+
+Download Rufus Portable
+	https://rufus.ie/en_US/
+
+Plug in flash drive with more than 2GB free space 
+	Make sure flash drive does not have any data you want to lose
+
+Run Rufus
+	Device: Flash drive you inserted
+		Verify name, size, etc if you have more than one
+	Boot Selection: "Disk or ISO image (please select)"
+	Click "SELECT"
+	Choose the "img" file you extracted earlier
+	Click "START"
+		THIS WILL WIPE YOUR FLASH DRIVE
+	Once complete, eject the flashdrive and remove it
+
+Plug flash drive into device you are installing OPNsense onto
+
+Boot onto the flash drive
+	UEFI if you can
+
+Once booted, OPNsense will start and run in live mode
+	This mode is good if you want to test OPNsense, but on reboot you will lose your changes
+
+Once prompted, log in with the following credentials:
+	Username: installer
+	Password: opnsense
+
+TODO: Complete setup to install OPNsense to the disk

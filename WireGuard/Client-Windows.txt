@@ -1,0 +1,22 @@
+Install WireGuard Client from WireGuard website
+	https://www.wireguard.com/install/
+	
+Click "Add Tunnel"
+	Click "Add Empty Tunnel"
+		Name: OPNsense
+		Under the config, add the following:
+			Under [Interface]
+				Address = <WireGuard VPN address>
+					EX: 10.0.1.2/32
+				DNS = <DNS Server 1>, <DNS Server 2>
+					EX: 10.0.0.1
+			
+			[Peer]
+			PublicKey = <Servers Public Key>
+			AllowedIPs = <Addresses to send over VPN tunnel>
+				EX: 0.0.0.0/0 (All traffic)
+				EX: 10.0.0.0/24, 10.0.1.1
+				EX: 10.0.0.0/24, 10.1.0.0/24
+			Endpoint = <DNS/IP of WireGuard server>:<Server Port>
+
+Set up client and peer in WireGuard server

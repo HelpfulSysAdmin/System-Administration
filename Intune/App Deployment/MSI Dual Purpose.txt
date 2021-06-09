@@ -1,0 +1,41 @@
+Symptom:
+	Deploying Remote Desktop Client via Intune, option to install as device missing
+		https://docs.microsoft.com/en-us/windows-server/remote/remote-desktop-services/clients/windowsdesktop#install-the-client
+	Without checking device install, issues were seen where app would not deploy
+
+Background:
+	Deploying Remote Desktop Client with parameter "ALLUSERS=1" (Device install)
+	Found that Intune uses the ALLUSERS property to determine if .msi is user/device/dual-purpose (both)
+
+Tested:
+	Submitting feedback to Microsoft asking them to make MSI a dual-purpose install
+
+Fix:
+	Verify that the .msi is set to "user only" (missing ALLUSERS)
+		Ran the following vbs script against the msi
+			set o_installer = CreateObject("WindowsInstaller.Installer")
+			set o_database = o_installer.OpenDatabase("RemoteDesktop_1.2.1844.0_x64.msi", 1)
+			s_SQL = "SELECT Property, Value FROM Property"
+			Set o_MSIView = o_DataBase.OpenView(s_SQL)
+			o_MSIView.Execute
+
+			Do
+				Set o_MSIRecord = o_MSIView.Fetch
+				i=0
+				if o_MSIRecord Is Nothing Then Exit Do
+				WScript.Echo o_MSIRecord.StringData(1)+"="+o_MSIRecord.StringData(2)
+				i = i + 1
+			Loop
+	Ran the following vbs script to add the property
+		set o_installer = CreateObject("WindowsInstaller.Installer")
+		set o_database = o_installer.OpenDatabase("RemoteDesktop_1.2.1844.0_x64.msi", 1)
+		s_SQL = "SELECT Property, Value FROM Property"
+		Set o_MSIView = o_DataBase.OpenView(s_SQL)
+		o_MSIView.Execute
+		Set o_MSIInsert = o_Database.OpenView("Insert INTO Property (Property, Value) Values ('ALLUSERS','2')")
+		o_MSIInsert.Execute
+		o_DataBase.Commit
+	Uploaded updated .msi to Intune and option to install as device was now allowed
+
+TODO:
+	Convert script to powershell file

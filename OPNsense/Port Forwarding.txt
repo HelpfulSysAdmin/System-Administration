@@ -1,0 +1,25 @@
+Firewall - NAT - Port Forward
+
+Add
+
+Interface: WAN
+TCP/IP Version: IPv4
+Protocol: 
+	Plex: TCP
+	Minecraft: TCP
+	Minecraft Bedrock: TCP
+	WireGuard: UDP
+Destination: WAN address
+Destination port range:
+	Plex: 32400
+	Minecraft: 25565
+	Minecraft Bedrock: 19132
+	WireGuard: 51820
+Redirect target IP: Single Host
+	<host IP>
+Description:
+	Plex
+	Minecraft
+	Minecraft Bedrock
+	WireGuard
+Filter rule association: Add associated filter rule

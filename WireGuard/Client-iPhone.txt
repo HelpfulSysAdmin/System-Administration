@@ -1,0 +1,31 @@
+Download WireGuard app from App Store
+	Name: WireGuard
+	Developer: WireGuard Development Team
+
+Open App
+
+Tap "Add a tunnel"
+	Tap "Create from scratch"
+	Name: <Descriptive name of WireGuard server>
+		EX: OPNsense
+		EX: <domain>
+	Tap "Generate keypair"
+		Set up client and peer in WireGuard server
+	Address: <IP of client VPN interface"
+		EX: 10.0.1.2/32
+	DNS Server: <DNS Server>
+		EX: 10.0.0.1
+	Tap "Add peer"
+		Public Key: <WireGuard servers public key>
+		Preshared Key: <Optional>
+		Endpoint: <domain/IP of WireGuard server>:<port>
+			EX: vpn.fakedomain.com:51820
+		Allowed IPs: <Comma seperated list of IPs to send through VPN>
+			EX: 0.0.0.0/0
+			EX: 10.0.0.0/24, 10.1.0.0/24
+	On-Demand Activation:
+		Unsure at the minute, but I think it's meant to auto-connect on certain WiFi SSIDs/Cellular
+
+Diagnostics
+	On the tunnel collection/addition screen, tap "Settings"
+	Click "View log"

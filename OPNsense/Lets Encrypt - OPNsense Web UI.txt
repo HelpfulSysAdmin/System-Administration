@@ -1,0 +1,56 @@
+Install Plugin
+	System - Firmware - Plugins
+	Click the plus next to "os-acme-client"
+
+Configure Cloudflare API key
+	Modify the API token from the "Dynamic DNS - Cloudflare API token" instructions
+	
+	Add Permission:
+		Zone : Zone : Read
+
+Configure Let's Encrypt
+	Services - Let's Encrypt
+	
+	Settings
+		Enable Enable Plugin
+		Enable Auto Renewal
+		Production Environment
+	
+	Accounts
+		Add
+			Enabled
+			Name: Domain Name
+	
+	Challenge Types
+		Add
+			Name: Cloudflare DNS - <domain>
+			Challenge Type: DNS-01
+			DNS Service: CloudFlare.com API
+			CF Account ID: <Account ID>
+				Log into Cloudflare
+				Click on domain you are working with
+				Fill in value with "API Zone ID"
+			CF API Token: <Cloudflare API Key>
+	
+	Automations
+		Add
+			Enabled
+			Name: Restart OPNsense UI
+			Run Command: "Restart OPNsense Web UI"
+	
+	Certificates
+		Add
+			Enabled
+			Common Name: <FQDN>
+			Alt Names: <Additional FQDNs>
+			LE Account: <Account created above (Domain Name)>
+			Challenge Type: <Challenge Type created above (Cloudflare DNS - <domain>)>
+			"Auto Renewal" Enabled
+			"Renewal Interval" = 30
+			Key Length = 4096
+			Automations
+				Restart OPNsense UI
+
+Set new certificate
+	System - Settings - Administration
+		SSL Certificate = <Certificate generated from above>

@@ -1,0 +1,96 @@
+https://docs.opnsense.org/manual/how-tos/wireguard-client.html
+
+Install Plugin
+	System - Firmware - Plugins
+	Install "os-wireguard"
+
+Configure WireGuard
+	VPN - WireGuard
+	
+	General
+		Enable WireGuard
+	
+	Local ("Server(s)")
+		Name: WireGuard
+		Public Key: <leave empty - key will be generated>
+		Private Key: <leave empty - key will be generated>
+		Listen Port: 51820 (Default. Can be changed, but needs to be unique)
+		Tunnel Address: The network you want to use for WireGuard
+			EX: 10.0.1.1/24
+		
+		After saving, note the Public Key
+	
+	Endpoints ("Clients" - Set up tunnel on client first to generate keys)
+		Name: <name of the client>
+		Public Key: <WireGuard client Public Key>
+		Shared Secret: (Optional)
+		AllowedIPs: The client's configured IP
+			EX: 10.0.1.2/32
+		
+	Add Endpoint as a "Peer"
+		VPN - WireGuard - Local
+		Edit the WireGuard Server the Client will connect to
+		Under "Peers", check each client that will be allowed to connect
+
+Setup Firewall
+	Firewall - NAT - Port Forward
+	Click "Add"
+		Interface: WAN
+		TCP/IP Version: IPv4
+		Protocol: UDP
+		Destination: WAN Address
+		Destination Port: (other) - 51820
+		Redirect Target IP: <LAN IP of OPNsense (not the WireGuard server IP)>
+		Redirect target port: 51820
+		Description: WireGuard
+		Filter rule association: Add associated filter rule
+	
+	Create an alias for WireGuard clients (if making more than 1 WireGuard Server)
+		Firewall - Aliases
+		Click "+" (Add)
+			Enabled
+			Name: WireGuard (If multiple WireGuard servers, be more descriptive)
+			Type: Host(s) or Network(s)
+				Choose Host if you want to add each IP individually
+				Choose Networks if you want to do the whole subnet
+			Content: <IP> or <Network /IP>
+				EX: 10.0.1.2
+				EX: 10.0.1.0/24
+	
+	Create Firewall Rule to pass VPN traffic
+		Firewall - Rules - WireGuard
+		Click "Add"
+			Action: Pass
+			Interface: WireGuard
+			Direction: In
+			TCP/IP Version: IPv4
+			Protocol: any
+			Source: "WireGuard net" or <Alias created above if multiple servers>
+			Destination: Any
+			Description: WireGuard VPN to LAN
+	
+Optional - Set up Internet routing
+	Set up WireGuard interface
+		Interfaces - Assignments
+		Under "New interface" select "wg0" and click "+" (Add)
+		Select the new WireGuard interface
+		Enable interface
+		Enable "Prevent interface removal"
+		Description "WG0"
+	
+	Set up outbound NAT
+		Firewall - NAT - Outbound
+			Change to Hybrid outbound NAT rule generation
+			Click "Add"
+				Interface: WAN
+				Source address: "WG0 net"
+					Name will change if multiple servers are set up
+				Translation / target: "WAN address"
+	
+	Set up Allowed IPs on client config only
+		Set to "0.0.0.0/0" for all traffic
+Connect Client
+
+Verify connection completes
+	VPN - WireGuard - List Configuration / Handshakes
+		List Configuration will show more details about the open tunnels

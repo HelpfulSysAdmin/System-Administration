@@ -1,0 +1,46 @@
+Symptom:
+Adding printer causes error "Printer driver was not installed. Unable to find a core driver package that is required by the printer driver package."
+
+Background:
+Server 2012 R2 x64
+Recently updated
+Xerox Copiers
+
+Tested:
+Removing all printer driver packages
+	PrintManagement screen (added print server to roles/features)
+Manually deleting driver files out of C:\Windows\System32\spool\drivers
+	Renaming the drivers folder and restarting spooler seemed to do this quite well
+Manually deleting driver packages
+	dism /online /get-drivers /format:table
+		Can out to file for better readability
+	pnputil /delete-driver <Published name>
+	
+	***ONLY REMOVE PRINTERS - Look at the "Class Name"***
+
+What should be the fix:
+	For my known good machine, I used the same kind (2012r2 with similar updates). I'd recommend verifying the OS build number to make sure your two machines are similar
+	
+	Find the GUID of the missing driver from Event Viewer
+		Event Viewer - Application and Services Logs - Microsoft - Windows - PrintService - Admin
+		Find the errors and under the "Details" tab one of the errors will say something like this:
+			Message: Unable to find core dependency (see additional info for driver GUID)
+			AdditionalInfo: {D20EA372-DD35-4950-9ED8-A6335AFE79F1} (NOTE: Your GUID might be different)
+		NOTE: Searching for the GUID that was missing for me returned the following page:
+			https://docs.microsoft.com/en-us/windows-hardware/drivers/print/package-aware-print-drivers-that-share-files
+			Notice Core File
+				PSCRIPT = {D20EA372-DD35-4950-9ED8-A6335AFE79F1}
+			At this point I knew it was something built into windows (Post Script Driver)
+	On a known good machine, find out what the GUID is
+		HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Print\PackageInstallation\ is a great place to look
+			I found mine under HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Print\PackageInstallation\Windows x64\CorePrinterDrivers
+		Clicking on the GUID in registry showed me that it was the x64 ntprint and where it was looking
+			InfPath: C:\WINDOWS\System32\DriverStore\FileRepository\ntprint.inf_amd64_3138b2c823dd1ea9\ntprint.inf
+				NOTE: Your path might be different! It seems like the part after amd64_ changes with each update to the file. It is important to have a similar machine to check this.
+	I was able to verify that the above path was missing, and I was able to confirm what the path should be, since there was an x86 driver on the broken machine with the same ending
+		ntprint.inf_x86_3138b2c823dd1ea9
+	Copy the folder from a known good machine to the broken machine
+	On the broken machine, check to see if registry keys are missing (mine were)
+		HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Print\PackageInstallation\Windows x64\CorePrinterDrivers\{D20EA372-DD35-4950-9ED8-A6335AFE79F1}
+		HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Print\PackageInstallation\Windows x64\DriverPackages\ntprint.inf_amd64_3138b2c823dd1ea9
+	Export Keys from known good and import to broken machine

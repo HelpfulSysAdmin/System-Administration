@@ -1,0 +1,25 @@
+Set up CloudFlare API Token
+	Sign into CloudFlare
+	Click on Profile Icon
+	Click "My Profile"
+	Click "API Tokens"
+	Click "Create Token"
+		Create Custom Token
+		Name: OPNsense
+		Permissions:
+			Zone : DNS : Edit
+		Zone Resources:
+			Include : Specific Zone : <domain for DDNS>
+		
+		Note the API Key, as it will only be provided once
+			You can Roll the key if you need to change it
+
+Set up OPNsense
+	Services -> Dynamic DNS
+
+	Add
+		Check "Enable"
+		Service Type = "CloudFlare API token"
+		"Interface to monitor" = WAN
+		Hostname = <hostname to update>
+		Password = <API Key>
